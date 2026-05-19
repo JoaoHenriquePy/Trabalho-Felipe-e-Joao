@@ -219,8 +219,8 @@ while op != 3:
                         if quantidade_desejada <= quantidade_estoque:
                             valor_total = quantidade_desejada * preco_produto
                             print(f"Valor total: R$ {valor_total:.2f}")
-                            confirmar = input("Confirmar compra? ").lower()
-                            if confirmar == "s":
+                            confirmar = input("Confirmar compra? (s/n)").lower()
+                            if confirmar == "s" or confirmar == "sim":
                                 estoque[produto_escolhido][1] = estoque[produto_escolhido][1] - quantidade_desejada
                                 dados_compra = [
                                     usuario_logado,
