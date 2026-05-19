@@ -134,7 +134,7 @@ while op != 3:
                     ovino = 0
                     suino = 0
                     disponivel_venda = 0
-
+    
                     i = 0
                     while i < len(rebanho):
                         tipo_atual = rebanho[i][0].lower()
@@ -153,7 +153,6 @@ while op != 3:
                             suino = suino + 1
 
                         if status_atual == "venda" or status_atual == "engorda" or status_atual == "disponivel para venda":
-
                             disponivel_venda = disponivel_venda + 1
 
                         i = i + 1
