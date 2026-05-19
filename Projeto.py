@@ -1,6 +1,6 @@
 op = 999
 
-usuarios = [["admin", "123", "ADM"], ["cliente", "456", "CLIENTE"]]
+usuarios = [["rene", "123", "ADM"], ["cliente", "456", "CLIENTE"]]
 rebanho = []
 historico_compras = []
 
@@ -134,7 +134,7 @@ while op != 3:
                     ovino = 0
                     suino = 0
                     disponivel_venda = 0
-    
+
                     i = 0
                     while i < len(rebanho):
                         tipo_atual = rebanho[i][0].lower()
