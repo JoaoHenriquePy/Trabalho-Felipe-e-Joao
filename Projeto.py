@@ -1,317 +1,403 @@
-op = 999
+from InquirerPy import inquirer
 
-usuarios = [["rene", "123", "ADM"], ["cliente", "456", "CLIENTE"]]
+opcao_menu_principal = "999"
+
 rebanho = []
 historico_compras = []
-
-estoque = [
-    ["Queijo Coalho", 120.0, 42.90],
-    ["Queijo Manteiga", 80.0, 48.50],
-    ["Leitão", 25.0, 180.0],
-    ["Leite (Litros)", 0.0, 3.50]
-]
 
 usuario_logado = ""
 tipo_logado = ""
 
-while op != 3:
+usuarios = [
+    {"usuario": "rene", "senha": "123", "perfil": "ADM"},
+    {"usuario": "cliente", "senha": "123", "perfil": "CLIENTE"}
+]
+
+estoque = [
+    {"nome": "Queijo Coalho", "quantidade": 120.0, "preco": 42.90},
+    {"nome": "Leite", "quantidade": 50.0, "preco": 3.50},
+    {"nome": "Carne Bovina", "quantidade": 200.0, "preco": 25.00},
+    {"nome": "Carne Suína", "quantidade": 150.0, "preco": 20.00},
+    {"nome": "Carne Caprina", "quantidade": 100.0, "preco": 30.00}
+]
+
+while opcao_menu_principal != "3. Sair do Sistema":
     print("\n------- MENU PRINCIPAL -------")
-    print("1. Fazer Login")
-    print("2. Cadastrar Novo Usuário")
-    print("3. Sair do Sistema")
-    print("------------------------------")
+    
+    opcao_menu_principal = inquirer.select(
+        message="Selecione a opção desejada:",
+        choices=[
+            "1. Fazer Login",
+            "2. Cadastrar Novo Usuário",
+            "3. Sair do Sistema"
+        ]
+    ).execute()
 
-    op = int(input("Digite a opção desejada: "))
-
-    if op == 1:
+    if opcao_menu_principal == "1. Fazer Login":
         usuario_digitado = input("Digite seu nome de usuário: ")
         senha_digitada = input("Digite sua senha: ")
-        login_ok = False
+        login_sucesso = False
 
-        i = 0
-        while i < len(usuarios):
-            nome_usuario = usuarios[i][0]
-            senha_usuario = usuarios[i][1]
-            tipo_usuario = usuarios[i][2]
+        indice_usuario = 0
+        while indice_usuario < len(usuarios):
+            nome_usuario = usuarios[indice_usuario]["usuario"]
+            senha_usuario = usuarios[indice_usuario]["senha"]
+            tipo_usuario = usuarios[indice_usuario]["perfil"]
 
             if nome_usuario == usuario_digitado:
                 if senha_usuario == senha_digitada:
                     usuario_logado = nome_usuario
                     tipo_logado = tipo_usuario
-                    login_ok = True
-                    print(f"\nBem-vindo, {usuario_logado}! Perfil: {tipo_logado}")
+                    login_sucesso = True
+                    print("\nBem-vindo,", usuario_logado, "! Perfil:", tipo_logado)
 
-            i = i + 1
-        if login_ok == False:
-            print("\nSenha ou nome inválido!")
+            indice_usuario = indice_usuario + 1
+            
+        if login_sucesso == False:
+            print("\nSenha ou nome de usuário inválido!")
         else:
             while tipo_logado == "ADM":
                 print("\n--------- PAINEL DO ADMINISTRADOR ---------")
-                print("1 - Cadastrar Animal")
-                print("2 - Buscar Animal")
-                print("3 - Atualizar Animal")
-                print("4 - Remover Animal")
-                print("5 - Relatório")
-                print("6 - Produção")
-                print("7 - Sair")
-                print("-------------------------------------------")
-                escolha_adm = input("Escolha: ").lower()
+                
+                escolha_administrador = inquirer.select(
+                    message="Escolha uma opção:",
+                    choices=[
+                        "1 - Cadastrar Animal",
+                        "2 - Buscar Animal",
+                        "3 - Atualizar Animal",
+                        "4 - Remover Animal",
+                        "5 - Relatório",
+                        "6 - Produção",
+                        "7 - Consultar Vendas",
+                        "8 - Sair"
+                    ]
+                ).execute()
 
-                if escolha_adm == "1" or escolha_adm == "cadastrar":
-                    print("\nTipos permitidos: Bovino, Caprino, Ovino, Suino")
-                    tipo_animal = input("Digite o tipo do animal: ").lower()
-
-                    while tipo_animal != "bovino" and tipo_animal != "caprino" and tipo_animal != "ovino" and tipo_animal != "suino":
-                        print("Tipo inválido!")
-                        tipo_animal = input("Digite novamente: ").lower()
-
-                    identificacao_animal = input("Digite a identificação: ")
+                if escolha_administrador == "1 - Cadastrar Animal":
+                    tipo_animal = inquirer.select(
+                        message="Selecione o tipo do animal:",
+                        choices=["Bovino", "Caprino", "Ovino", "Suíno"]
+                    ).execute().lower()
+                    
+                    print("\nExemplos de identificação: Brinco 102, Mimosa, ID-05")
+                    identificacao_animal = input("Digite a identificação do animal: ")
                     status_animal = input("Digite o status do animal: ")
-                    dados_animal = [tipo_animal, identificacao_animal, status_animal]
+                    
+                    dados_animal = {"tipo": tipo_animal, "identificacao": identificacao_animal, "status": status_animal}
                     rebanho.append(dados_animal)
                     print("Animal cadastrado com sucesso!")
 
-                elif escolha_adm == "2" or escolha_adm == "buscar":
-                    busca = input("Digite a identificação do animal: ").lower()
-                    encontrado = False
+                elif escolha_administrador == "2 - Buscar Animal":
+                    busca_animal = input("Digite a identificação do animal: ").lower()
+                    animal_encontrado = False
 
-                    i = 0
-                    while i < len(rebanho):
-                        id_atual = rebanho[i][1].lower()
-
-                        if id_atual == busca:
+                    indice_animal = 0
+                    while indice_animal < len(rebanho):
+                        identificacao_atual = rebanho[indice_animal]["identificacao"].lower()
+                        if identificacao_atual == busca_animal:
                             print("\nAnimal encontrado!")
-                            print("Tipo:", rebanho[i][0])
-                            print("Identificação:", rebanho[i][1])
-                            print("Status:", rebanho[i][2])
-                            encontrado = True
+                            print("Tipo:", rebanho[indice_animal]["tipo"])
+                            print("Identificação:", rebanho[indice_animal]["identificacao"])
+                            print("Status:", rebanho[indice_animal]["status"])
+                            animal_encontrado = True
 
-                        i = i + 1
-                    if encontrado == False:
+                        indice_animal = indice_animal + 1
+                    if animal_encontrado == False:
                         print("Animal não encontrado!")
 
-                elif escolha_adm == "3" or escolha_adm == "atualizar":
-                    busca = input("Digite a identificação do animal: ").lower()
-                    atualizado = False
+                elif escolha_administrador == "3 - Atualizar Animal":
+                    busca_animal = input("Digite a identificação do animal: ").lower()
+                    animal_atualizado = False
 
-                    i = 0
-                    while i < len(rebanho):
-                        id_atual = rebanho[i][1].lower()
-
-                        if id_atual == busca:
+                    indice_animal = 0
+                    while indice_animal < len(rebanho):
+                        identificacao_atual = rebanho[indice_animal]["identificacao"].lower()
+                        if identificacao_atual == busca_animal:
                             print("Animal encontrado!")
-                            print("Status atual:", rebanho[i][2])
+                            print("Status atual:", rebanho[indice_animal]["status"])
                             novo_status = input("Digite o novo status: ")
-                            rebanho[i][2] = novo_status
-                            atualizado = True
-                            print("Status atualizado!")
+                            rebanho[indice_animal]["status"] = novo_status
+                            animal_atualizado = True
+                            print("Status updated com sucesso!")
 
-                        i = i + 1
-                    if atualizado == False:
+                        indice_animal = indice_animal + 1
+                    if animal_atualizado == False:
                         print("Animal não encontrado!")
 
-                elif escolha_adm == "4" or escolha_adm == "remover":
-                    remover = input("Digite a identificação do animal: ").lower()
-                    removido = False
+                elif escolha_administrador == "4 - Remover Animal":
+                    remover_animal = input("Digite a identificação do animal: ").lower()
+                    animal_removido = False
 
-                    i = 0
-                    while i < len(rebanho):
-                        id_atual = rebanho[i][1].lower()
-
-                        if id_atual == remover:
-                            del rebanho[i]
-                            removido = True
-                            print("Animal removido!")
+                    indice_animal = 0
+                    while indice_animal < len(rebanho):
+                        identificacao_atual = rebanho[indice_animal]["identificacao"].lower()
+                        if identificacao_atual == remover_animal:
+                            del rebanho[indice_animal]
+                            animal_removido = True
+                            print("Animal removido com sucesso!")
                             break
 
-                        i = i + 1
-                    if removido == False:
+                        indice_animal = indice_animal + 1
+                    if animal_removido == False:
                         print("Animal não encontrado!")
 
-                elif escolha_adm == "5" or escolha_adm == "relatorio":
-                    bovino = 0
-                    caprino = 0
-                    ovino = 0
-                    suino = 0
-                    disponivel_venda = 0
+                elif escolha_administrador == "5 - Relatório":
+                    quantidade_bovinos = 0
+                    quantidade_caprinos = 0
+                    quantidade_ovinos = 0
+                    quantidade_suinos = 0
+                    animais_disponiveis = 0
 
-                    i = 0
-                    while i < len(rebanho):
-                        tipo_atual = rebanho[i][0].lower()
-                        status_atual = rebanho[i][2].lower()
+                    indice_animal = 0
+                    while indice_animal < len(rebanho):
+                        tipo_atual = rebanho[indice_animal]["tipo"].lower()
+                        status_atual = rebanho[indice_animal]["status"].lower()
 
                         if tipo_atual == "bovino":
-                            bovino = bovino + 1
-
+                            quantidade_bovinos = quantidade_bovinos + 1
                         elif tipo_atual == "caprino":
-                            caprino = caprino + 1
-
+                            quantidade_caprinos = quantidade_caprinos + 1
                         elif tipo_atual == "ovino":
-                            ovino = ovino + 1
+                            quantidade_ovinos = quantidade_ovinos + 1
+                        elif tipo_atual == "suíno" or tipo_atual == "suino":
+                            quantidade_suinos = quantidade_suinos + 1
 
-                        elif tipo_atual == "suino":
-                            suino = suino + 1
+                        if status_atual == "venda" or status_atual == "engorda" or status_atual == "disponível para venda" or status_atual == "disponivel para venda":
+                            animais_disponiveis = animais_disponiveis + 1
 
-                        if status_atual == "venda" or status_atual == "engorda" or status_atual == "disponivel para venda":
-                            disponivel_venda = disponivel_venda + 1
-
-                        i = i + 1
+                        indice_animal = indice_animal + 1
                     print("\n------ RELATÓRIO ------")
-                    print("Bovinos:", bovino)
-                    print("Caprinos:", caprino)
-                    print("Ovinos:", ovino)
-                    print("Suinos:", suino)
+                    print("Bovinos:", quantidade_bovinos)
+                    print("Caprinos:", quantidade_caprinos)
+                    print("Ovinos:", quantidade_ovinos)
+                    print("Suínos:", quantidade_suinos)
                     print("Total de animais:", len(rebanho))
-                    print("Animais disponíveis para venda:", disponivel_venda)
+                    print("Animais disponíveis para venda:", animais_disponiveis)
 
-                elif escolha_adm == "6" or escolha_adm == "producao":
+                elif escolha_administrador == "6 - Produção":
                     print("\n--- ATUALIZAR PRODUÇÃO ---")
-                    nome_produto = input("Digite o nome do produto: ")
-                    produto_encontrado = False
+                    print("Produtos em estoque atualmente:")
+                    
+                    indice_estoque = 0
+                    opcoes_produtos = []
+                    while indice_estoque < len(estoque):
+                        nome_produto = estoque[indice_estoque]["nome"]
+                        quantidade_produto = estoque[indice_estoque]["quantidade"]
+                        print("-", nome_produto, "(Quantidade atual:", quantidade_produto, ")")
+                        opcoes_produtos.append(nome_produto)
+                        indice_estoque = indice_estoque + 1
+                    
+                    print("-----------------------------------")
+                    
+                    produto_selecionado = inquirer.select(
+                        message="Selecione o produto que deseja abastecer:",
+                        choices=opcoes_produtos
+                    ).execute()
+                    
+                    indice_estoque = 0
+                    while indice_estoque < len(estoque):
+                        if estoque[indice_estoque]["nome"].lower() == produto_selecionado.lower():
+                            quantidade_adicionar = float(input("Quantidade para adicionar: "))
+                            estoque[indice_estoque]["quantidade"] = estoque[indice_estoque]["quantidade"] + quantidade_adicionar
+                            print("Estoque atualizado com sucesso!")
+                            break
+                        indice_estoque = indice_estoque + 1
 
-                    i = 0
-                    while i < len(estoque):
-                        nome_atual = estoque[i][0].lower()
+                elif escolha_administrador == "7 - Consultar Vendas":
+                    print("\n------ HISTÓRICO GLOBAL DE VENDAS ------")
+                    if len(historico_compras) == 0:
+                        print("Nenhuma venda foi realizada até o momento.")
+                    else:
+                        indice_venda = 0
+                        while indice_venda < len(historico_compras):
+                            venda_atual = historico_compras[indice_venda]
+                            print("Cliente:", venda_atual["usuario"], "| Produto:", venda_atual["produto"], "| Quantidade:", venda_atual["quantidade"], "| Total: R$", round(venda_atual["valor"], 2), "| Retirada:", venda_atual["retirada"])
+                            indice_venda = indice_venda + 1
 
-                        if nome_atual == nome_produto.lower():
-                            quantidade_add = float(input("Quantidade para adicionar: "))
-                            estoque[i][1] = estoque[i][1] + quantidade_add
-                            produto_encontrado = True
-                            print("Estoque atualizado!")
-
-                        i = i + 1
-                    if produto_encontrado == False:
-                        print("Produto não encontrado!")
-
-                elif escolha_adm == "7" or escolha_adm == "sair":
+                elif escolha_administrador == "8 - Sair":
                     print("Saindo do painel ADM...")
+                    tipo_logado = ""
                     break
 
             while tipo_logado == "CLIENTE":
                 print("\n--------- MENU CLIENTE ---------")
-                print("1. Ver estoque e comprar")
-                print("2. Histórico de compras")
-                print("3. Agendar retirada")
-                print("4. Sair")
-                print("--------------------------------")
-                escolha_cliente = input("Escolha uma opção: ")
+                
+                escolha_cliente = inquirer.select(
+                    message="Escolha uma opção:",
+                    choices=[
+                        "1. Ver estoque e comprar",
+                        "2. Histórico de compras",
+                        "3. Agendar retirada",
+                        "4. Sair"
+                    ]
+                ).execute()
 
-                if escolha_cliente == "1":
-                    print("\n------ ESTOQUE ------")
+                if escolha_cliente == "1. Ver estoque e comprar":
+                    print("\n                       ------ ESTOQUE ------")
+                    opcoes_estoque = []
+                    indice_estoque = 0
+                    while indice_estoque < len(estoque):
+                        sufixo_medida = "Quilos"
+                        if estoque[indice_estoque]["nome"] == "Leite":
+                            sufixo_medida = "Litros"
+                        
+                        nome_produto_estoque = estoque[indice_estoque]["nome"]
+                        quantidade_produto_estoque = estoque[indice_estoque]["quantidade"]
+                        preco_produto_estoque = round(estoque[indice_estoque]["preco"], 2)
+                        
+                        texto_opcao = f"{nome_produto_estoque} | Quantidade: {quantidade_produto_estoque} {sufixo_medida} | Preço: R$ {preco_produto_estoque}"
+                        opcoes_estoque.append({"name": texto_opcao, "valor": indice_estoque})
+                        indice_estoque = indice_estoque + 1
+                        
+                    produto_escolhido = inquirer.select(
+                        message="Selecione o produto que deseja comprar:",
+                        choices=opcoes_estoque
+                    ).execute()
 
-                    i = 0
-                    while i < len(estoque):
-                        nome_produto = estoque[i][0]
-                        quantidade_produto = estoque[i][1]
-                        preco_produto = estoque[i][2]
-                        print(f"{i+1} - {nome_produto} | Quantidade: {quantidade_produto} | Preço: R${preco_produto:.2f}")
+                    nome_produto = estoque[produto_escolhido]["nome"]
+                    quantidade_estoque = estoque[produto_escolhido]["quantidade"]
+                    preco_produto = estoque[produto_escolhido]["preco"]
+                    
+                    quantidade_desejada = float(input("Digite a quantidade desejada: "))
 
-                        i = i + 1
-                    produto_escolhido = int(input("\nDigite o número do produto: ")) - 1
-
-                    if produto_escolhido >= 0 and produto_escolhido < len(estoque):
-                        nome_produto = estoque[produto_escolhido][0]
-                        quantidade_estoque = estoque[produto_escolhido][1]
-                        preco_produto = estoque[produto_escolhido][2]
-                        quantidade_desejada = float(input("Digite a quantidade desejada: "))
-
-                        if quantidade_desejada <= quantidade_estoque:
-                            valor_total = quantidade_desejada * preco_produto
-                            print(f"Valor total: R$ {valor_total:.2f}")
-                            confirmar = input("Confirmar compra? (s/n)").lower()
-                            if confirmar == "s" or confirmar == "sim":
-                                estoque[produto_escolhido][1] = estoque[produto_escolhido][1] - quantidade_desejada
-                                dados_compra = [
-                                    usuario_logado,
-                                    nome_produto,
-                                    quantidade_desejada,
-                                    valor_total,
-                                    "Pendente"
-                                ]
-                                historico_compras.append(dados_compra)
-                                print("Compra realizada!")
-
-                        else:
-                            print("Quantidade insuficiente!")
+                    if quantidade_desejada <= quantidade_estoque:
+                        valor_total = quantidade_desejada * preco_produto
+                        print("Valor total: R$", round(valor_total, 2))
+                        
+                        confirmar_compra = inquirer.select(
+                            message="Confirmar compra?",
+                            choices=["Sim", "Não"]
+                        ).execute()
+                        
+                        if confirmar_compra == "Sim":
+                            estoque[produto_escolhido]["quantidade"] = estoque[produto_escolhido]["quantidade"] - quantidade_desejada
+                            dados_compra = {
+                                "usuario": usuario_logado,
+                                "produto": nome_produto,
+                                "quantidade": quantidade_desejada,
+                                "valor": valor_total,
+                                "retirada": "Pendente"
+                            }
+                            historico_compras.append(dados_compra)
+                            print("Compra realizada com sucesso!")
                     else:
-                        print("Produto inválido!")
-                elif escolha_cliente == "2":
-                    print("\n------ HISTÓRICO ------")
+                        print("Quantidade insuficiente!")
+
+                elif escolha_cliente == "2. Histórico de compras":
+                    print("\n------ HISTÓRICO DE COMPRAS ------")
                     total_gasto = 0
                     tem_compra = False
-                    contagem = [
-                        ["Queijo Coalho", 0],
-                        ["Queijo Manteiga", 0],
-                        ["Leitão", 0],
-                        ["Leite (Litros)", 0]
-                    ]
 
-                    i = 0
-                    while i < len(historico_compras):
-                        usuario_compra = historico_compras[i][0]
+                    indice_compras = 0
+                    while indice_compras < len(historico_compras):
+                        if historico_compras[indice_compras]["usuario"] == usuario_logado:
+                            produto_nome = historico_compras[indice_compras]["produto"]
+                            produto_quantidade = historico_compras[indice_compras]["quantidade"]
+                            produto_valor = f"R$ {historico_compras[indice_compras]['valor']:.2f}"
+                            produto_retirada = historico_compras[indice_compras]["retirada"]
 
-                        if usuario_compra == usuario_logado:
-                            nome_produto = historico_compras[i][1]
-                            quantidade = historico_compras[i][2]
-                            valor = historico_compras[i][3]
-                            retirada = historico_compras[i][4]
-                            print(f"{nome_produto} | Qtd: {quantidade} | Total: R${valor:.2f} | Retirada: {retirada}")
-                            total_gasto = total_gasto + valor
+                            print(produto_nome, "| quantidade:", produto_quantidade, "| Total: R$", produto_valor, "| Retirada:", produto_retirada)
+                            total_gasto = total_gasto + historico_compras[indice_compras]["valor"]
                             tem_compra = True
-
-                            c = 0
-                            while c < len(contagem):
-                                if contagem[c][0] == nome_produto:
-                                    contagem[c][1] = contagem[c][1] + 1
-                                c = c + 1
-
-                        i = i + 1
+                        indice_compras = indice_compras + 1
+                        
                     if tem_compra == False:
                         print("Nenhuma compra encontrada!")
                     else:
-                        print(f"\nTotal gasto: R$ {total_gasto:.2f}")
-                        maior = 0
-                        produto_mais = ""
+                        print("\nTotal gasto por você: R$", round(total_gasto, 2))
+                        
+                        quantidade_queijo = 0
+                        quantidade_leite = 0
+                        quantidade_carne_bovina = 0
+                        quantidade_carne_suina = 0
+                        quantidade_carne_caprina = 0
+                        
+                        indice_compras = 0
+                        while indice_compras < len(historico_compras):
+                            if historico_compras[indice_compras]["usuario"] == usuario_logado:
+                                produto_atual_historico = historico_compras[indice_compras]["produto"]
+                                quantidade_atual_historico = historico_compras[indice_compras]["quantidade"]
+                                
+                                if produto_atual_historico == "Queijo Coalho":
+                                    quantidade_queijo = quantidade_queijo + quantidade_atual_historico
+                                elif produto_atual_historico == "Leite":
+                                    quantidade_leite = quantidade_leite + quantidade_atual_historico
+                                elif produto_atual_historico == "Carne Bovina":
+                                    quantidade_carne_bovina = quantidade_carne_bovina + quantidade_atual_historico
+                                elif produto_atual_historico == "Carne Suína":
+                                    quantidade_carne_suina = quantidade_carne_suina + quantidade_atual_historico
+                                elif produto_atual_historico == "Carne Caprina":
+                                    quantidade_carne_caprina = quantidade_carne_caprina + quantidade_atual_historico
+                            indice_compras = indice_compras + 1
+                            
+                        vendas_totais_cliente = {
+                            "Queijo Coalho": quantidade_queijo, 
+                            "Leite": quantidade_leite, 
+                            "Carne Bovina": quantidade_carne_bovina, 
+                            "Carne Suína": quantidade_carne_suina, 
+                            "Carne Caprina": quantidade_carne_caprina
+                        }
+                        
+                        produto_mais_comprado = ""
+                        maior_quantidade = 0
+                        
+                        for produto_chave in vendas_totais_cliente:
+                            if vendas_totais_cliente[produto_chave] > maior_quantidade:
+                                maior_quantidade = vendas_totais_cliente[produto_chave]
+                                produto_mais_comprado = produto_chave
+                                
+                        if maior_quantidade > 0:
+                            print("Produto mais comprado por você:", produto_mais_comprado)
 
-                        i = 0
-                        while i < len(contagem):
+                elif escolha_cliente == "3. Agendar retirada":
+                    data_retirada = input("Digite a data para retirada nesse formato (dd/mm/yyyy): ")
+                    hora_retirada = input("Digite a hora para retirada nesse formato (hh:mm): ")
+                    agendamento_realizado = False
 
-                            if contagem[i][1] > maior:
-                                maior = contagem[i][1]
-                                produto_mais = contagem[i][0]
+                    print("\n==========================================")
+                    print("         FAZENDA SERTÃO - RECIBO          ")
+                    print("Cliente:", usuario_logado)
+                    print("Agendado para:", data_retirada, "as", hora_retirada)
+                    print("------------------------------------------")
+                
+                    indice_compras = 0
+                    total_recibo = 0
+                    while indice_compras < len(historico_compras):
+                        if historico_compras[indice_compras]["usuario"] == usuario_logado and historico_compras[indice_compras]["retirada"] == "Pendente":
+                            historico_compras[indice_compras]["retirada"] = data_retirada + " as " + hora_retirada
 
-                            i = i + 1
-                        if produto_mais != "":
-                            print("Produto mais comprado:", produto_mais)
+                            produto_recibo = historico_compras[indice_compras]["produto"]
+                            quantidade_recibo = historico_compras[indice_compras]["quantidade"]
+                            valor_recibo = round(historico_compras[indice_compras]["valor"], 2)
+                            
+                            print("-", produto_recibo, "quantidade", quantidade_recibo, "| R$", valor_recibo)
+                            total_recibo = total_recibo + historico_compras[indice_compras]["valor"]
+                            agendamento_realizado = True
+                        indice_compras = indice_compras + 1
+                        
+                    print("------------------------------------------")
+                    print("TOTAL DO PEDIDO: R$", round(total_recibo, 2))
+                    print("==========================================")
+                    
+                    if agendamento_realizado:
+                        print("Retirada agendada e recibo emitido com sucesso!")
+                    else:
+                        print("Você não possui compras pendentes para agendar.")
 
-                elif escolha_cliente == "3":
-                    data = input("Digite a data: ")
-                    hora = input("Digite a hora: ")
-
-                    i = 0
-                    while i < len(historico_compras):
-                        if historico_compras[i][0] == usuario_logado:
-                            if historico_compras[i][4] == "Pendente":
-                                historico_compras[i][4] = data + " às " + hora
-                        i = i + 1
-                    print("Retirada agendada!")
-
-                elif escolha_cliente == "4":
+                elif escolha_cliente == "4. Sair":
                     print("Saindo do painel cliente...")
-
+                    tipo_logado = ""
                     break
 
-    elif op == 2:
+    elif opcao_menu_principal == "2. Cadastrar Novo Usuário":
         print("\n------ NOVO USUÁRIO ------")
         novo_usuario = input("Digite o nome do usuário: ")
         nova_senha = input("Digite a senha: ")
-        tipo_usuario = input("Digite ADM ou CLIENTE: ").upper()
+        
+        tipo_usuario = inquirer.select(
+            message="Selecione o perfil do novo usuário:",
+            choices=["ADM", "CLIENTE"]
+        ).execute()
 
-        while tipo_usuario != "ADM" and tipo_usuario != "CLIENTE":
-            print("Tipo inválido!")
-            tipo_usuario = input("Digite ADM ou CLIENTE: ").upper()
-        novo_cadastro = [novo_usuario, nova_senha, tipo_usuario]
-        usuarios.append(novo_cadastro)
+        usuarios.append({"usuario": novo_usuario, "senha": nova_senha, "perfil": tipo_usuario})
         print("Usuário cadastrado com sucesso!")
-    elif op == 3:
-        print("\nSistema encerrado com sucesso.")
